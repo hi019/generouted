@@ -12,9 +12,13 @@ const ROUTES = import.meta.glob<Module>(['/src/pages/**/[\\w[]*.{jsx,tsx}', '!**
 
 const preservedRoutes = generatePreservedRoutes<Element>(PRESERVED)
 
+export function DefaultErrorElement() {
+  throw useRouteError();
+}
+
 const regularRoutes = generateRegularRoutes<RouteObject, () => Promise<Module>>(ROUTES, (module, key) => {
   const Element = lazy(module)
-  const ErrorElement = lazy(() => module().then((module) => ({ default: module.ErrorElement || () => throw useRouteError() })))
+  const ErrorElement = lazy(() => module().then((module) => ({ default: module.ErrorElement || DefaultErrorElement })))
   const index = /(?<!pages\/)index\.(jsx|tsx)$/.test(key) ? { index: true } : {}
 
   return {
