@@ -1,5 +1,5 @@
 import { Fragment, lazy, Suspense } from 'react'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider, useRouteError } from 'react-router-dom'
 import type { ActionFunction, RouteObject, LoaderFunction } from 'react-router-dom'
 
 import { generatePreservedRoutes, generateRegularRoutes } from './core'
@@ -14,7 +14,7 @@ const preservedRoutes = generatePreservedRoutes<Element>(PRESERVED)
 
 const regularRoutes = generateRegularRoutes<RouteObject, () => Promise<Module>>(ROUTES, (module, key) => {
   const Element = lazy(module)
-  const ErrorElement = lazy(() => module().then((module) => ({ default: module.ErrorElement || null })))
+  const ErrorElement = lazy(() => module().then((module) => ({ default: module.ErrorElement || () => throw useRouteError() })))
   const index = /(?<!pages\/)index\.(jsx|tsx)$/.test(key) ? { index: true } : {}
 
   return {
